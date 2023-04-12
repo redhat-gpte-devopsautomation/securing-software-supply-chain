@@ -1,0 +1,12 @@
+kind: Route
+apiVersion: route.openshift.io/v1
+metadata:
+  name: gitops-webhook-event-listener-route
+spec:
+  to:
+    kind: Service
+    name: el-app-globex-ui-event-listener
+    weight: 100
+  port:
+    targetPort: http-listener
+  wildcardPolicy: None

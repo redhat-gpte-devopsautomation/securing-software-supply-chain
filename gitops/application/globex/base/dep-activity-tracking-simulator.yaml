@@ -1,0 +1,73 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app.kubernetes.io/instance: globex-app
+    app.kubernetes.io/name: activity-tracking-simulator
+    app.kubernetes.io/part-of: globex-app
+    app.kubernetes.io/version: 1.0.0
+    app.openshift.io/runtime: quarkus
+  name: activity-tracking-simulator
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: activity-tracking-simulator
+      app.kubernetes.io/part-of: globex-app
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: activity-tracking-simulator
+        app.kubernetes.io/part-of: globex-app
+    spec:
+      containers:
+      - env:
+        - name: ACTIVITY_TRACKING_SERVICE_HOST
+          value: activity-tracking:8080
+        image: quay.io/redhat-gpte/globex-activity-tracking-simulator:app-mod-workshop
+        imagePullPolicy: IfNotPresent
+        livenessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /q/health/live
+            port: http
+            scheme: HTTP
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          successThreshold: 1
+          timeoutSeconds: 3
+        name: activity-tracking-simulator
+        ports:
+        - containerPort: 8080
+          name: http
+          protocol: TCP
+        readinessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /q/health/ready
+            port: http
+            scheme: HTTP
+          initialDelaySeconds: 5
+          periodSeconds: 10
+          successThreshold: 1
+          timeoutSeconds: 3
+        resources:
+          limits:
+            cpu: 100m
+            memory: 250Mi
+          requests:
+            cpu: 100m
+            memory: 128Mi
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      serviceAccount: activity-tracking-simulator
+      serviceAccountName: activity-tracking-simulator
+      terminationGracePeriodSeconds: 30

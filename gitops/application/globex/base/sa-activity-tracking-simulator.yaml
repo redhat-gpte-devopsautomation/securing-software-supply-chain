@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  labels:
+    app.kubernetes.io/instance: globex-app
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: activity-tracking-simulator
+    app.kubernetes.io/part-of: globex-app
+    app.kubernetes.io/version: 1.0.0
+    helm.sh/chart: activity-tracking-simulator-0.1.0
+  name: activity-tracking-simulator

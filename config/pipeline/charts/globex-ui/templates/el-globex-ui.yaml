@@ -1,0 +1,60 @@
+apiVersion: triggers.tekton.dev/v1alpha1
+kind: EventListener
+metadata:
+  creationTimestamp: null
+  name: app-globex-ui-event-listener
+spec:
+  namespaceSelector: {}
+  resources:
+    kubernetesResource:
+      replicas: 1
+  serviceAccountName: pipeline
+  triggers:
+  - bindings:
+    - ref: app-globex-ui-binding
+    - ref: github-push-binding
+    interceptors:
+    - params:
+      - name: secretRef
+        value:
+          secretKey: webhook-secret-key
+          secretName: webhook-secret-globex-ui
+      ref:
+        name: github
+    - params:
+      - name: filter
+        value: (header.match('X-GitHub-Event', 'push') && body.repository.full_name
+          == 'dev-user/globex-ui')
+      - name: overlays
+        value:
+        - expression: body.ref.split('/')[2]
+          key: ref
+      ref:
+        name: cel
+    name: build-from-push-globex-ui
+    template:
+      ref: app-globex-ui-template
+  - bindings:
+    - ref: app-globex-ui-unsigned-binding
+    - ref: github-push-binding
+    interceptors:
+    - params:
+      - name: secretRef
+        value:
+          secretKey: webhook-secret-key
+          secretName: webhook-secret-globex-ui
+      ref:
+        name: github
+    - params:
+      - name: filter
+        value: (header.match('X-GitHub-Event', 'push') && body.repository.full_name
+          == 'dev-user/globex-ui')
+      - name: overlays
+        value:
+        - expression: body.ref.split('/')[2]
+          key: ref
+      ref:
+        name: cel
+    name: build-from-push-globex-ui-unsigned
+    template:
+      ref: app-globex-ui-unsigned-template

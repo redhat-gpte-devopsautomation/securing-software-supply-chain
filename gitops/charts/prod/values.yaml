@@ -1,0 +1,10 @@
+#ODF Chart Values
+
+production:
+  repoUrl: ""
+  globex:
+    namespace: globex
+    contextDir: ""
+  kafka:
+    namespace: kafka
+    contextDir: ""

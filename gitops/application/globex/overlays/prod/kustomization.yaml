@@ -1,0 +1,10 @@
+bases:
+- ../../base
+patches:
+- target:
+    kind: Deployment
+    name: globex-ui
+  patch: |-
+    - op: replace
+      path: /spec/template/spec/containers/0/image
+      value: quay.io/redhat-gpte/globex-recommendation-ui:app-mod-workshop

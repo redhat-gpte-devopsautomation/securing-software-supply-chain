@@ -1,0 +1,66 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    app.openshift.io/connects-to: |
+      [{"apiVersion":"apps/v1","kind":"Deployment","name":"catalog"},
+      {"apiVersion":"apps/v1","kind":"Deployment","name":"recommendation-engine"},
+      {"apiVersion":"apps/v1","kind":"Deployment","name":"activity-tracking"},
+      {"apiVersion":"apps/v1","kind":"Deployment","name":"order-placement"}]
+  labels:
+    app.kubernetes.io/instance: globex-app
+    app.kubernetes.io/name: globex-ui
+    app.kubernetes.io/part-of: globex-app
+    app.kubernetes.io/version: 1.0.0
+    app.openshift.io/runtime: nodejs
+  name: globex-ui
+spec:
+  progressDeadlineSeconds: 600
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: globex-ui
+      app.kubernetes.io/part-of: globex-app
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: globex-ui
+        app.kubernetes.io/part-of: globex-app
+    spec:
+      containers:
+      - env:
+        - name: NODE_ENV
+          value: prod
+        - name: PORT
+          value: "8080"
+        - name: API_TRACK_USERACTIVITY
+          value: http://activity-tracking:8080/track
+        - name: API_GET_PAGINATED_PRODUCTS
+          value: http://catalog:8080/services/products
+        - name: API_GET_PRODUCT_DETAILS_BY_IDS
+          value: http://catalog:8080/services/product/list/
+        - name: API_CATALOG_RECOMMENDED_PRODUCT_IDS
+          value: http://recommendation-engine:8080/score/product
+        - name: API_TRACK_PLACEORDER
+          value: http://order-placement:8080/placeorder
+        image: quay.io/redhat-gpte/globex-recommendation-ui:app-mod-workshop
+        imagePullPolicy: IfNotPresent
+        name: globex-ui
+        ports:
+        - containerPort: 8080
+          name: http
+          protocol: TCP
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      serviceAccount: globex-app-globex-ui
+      serviceAccountName: globex-app-globex-ui
+      terminationGracePeriodSeconds: 30

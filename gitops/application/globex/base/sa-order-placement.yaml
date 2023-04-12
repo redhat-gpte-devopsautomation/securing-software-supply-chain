@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  labels:
+    app.kubernetes.io/instance: globex-app
+    app.kubernetes.io/name: order-placement
+    app.kubernetes.io/part-of: globex-app
+    app.kubernetes.io/version: 1.0.0
+  name: order-placement

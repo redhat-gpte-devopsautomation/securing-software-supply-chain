@@ -1,0 +1,77 @@
+apiVersion: triggers.tekton.dev/v1alpha1
+kind: TriggerTemplate
+metadata:
+  creationTimestamp: null
+  name: app-globex-ui-unsigned-template
+spec:
+  params:
+  - description: The git branch for this PR.
+    name: io.openshift.build.commit.ref
+  - description: the specific commit SHA.
+    name: io.openshift.build.commit.id
+  - description: The date at which the commit was made
+    name: io.openshift.build.commit.date
+  - description: The name of the github user handle that made the commit
+    name: io.openshift.build.commit.author
+  - description: The commit message
+    name: io.openshift.build.commit.message
+  - description: The git repository URL.
+    name: gitrepositoryurl
+  - description: The file to update to point to newly built image
+    name: manifestFile
+  - description: The repo to update to point to newly built image
+    name: manifestRepo
+  - description: Enable image repository TLS certification verification.
+    name: tlsVerify
+  - description: Extra parameters passed for the push command when pushing images.
+    name: build_extra_args
+  - description: Target image repository name
+    name: imageRepo
+  resourcetemplates:
+  - apiVersion: tekton.dev/v1beta1
+    kind: PipelineRun
+    metadata:
+      generateName: app-globex-ui-unsigned-pipeline-
+    spec:
+      params:
+      - name: GIT_REPO
+        value: $(tt.params.gitrepositoryurl)
+      - name: TLSVERIFY
+        value: $(tt.params.tlsVerify)
+      - name: BUILD_EXTRA_ARGS
+        value: $(tt.params.build_extra_args)
+      - name: IMAGE_REPO
+        value: $(tt.params.imageRepo)
+      - name: IMAGE_TAG
+        value: $(tt.params.io.openshift.build.commit.ref)-$(tt.params.io.openshift.build.commit.id)
+      - name: MANIFEST_FILE
+        value: $(tt.params.manifestFile)
+      - name: MANIFEST_REPO
+        value: $(tt.params.manifestRepo)
+      - name: COMMIT_SHA
+        value: $(tt.params.io.openshift.build.commit.id)
+      - name: GIT_REF
+        value: $(tt.params.io.openshift.build.commit.ref)
+      - name: COMMIT_DATE
+        value: $(tt.params.io.openshift.build.commit.date)
+      - name: COMMIT_AUTHOR
+        value: $(tt.params.io.openshift.build.commit.author)
+      - name: COMMIT_MESSAGE
+        value: $(tt.params.io.openshift.build.commit.message)
+      pipelineRef:
+        name: app-globex-ui-unsigned-pipeline
+      serviceAccountName: pipeline
+      workspaces:
+        - name: shared-data
+          volumeClaimTemplate:
+            metadata:
+              creationTimestamp: null
+            spec:
+              accessModes:
+                - ReadWriteOnce
+              resources:
+                requests:
+                  storage: 1Gi
+            status: {}
+        - emptyDir: {}
+          name: maven-settings

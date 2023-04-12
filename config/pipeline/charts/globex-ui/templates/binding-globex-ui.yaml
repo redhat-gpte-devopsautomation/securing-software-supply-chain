@@ -1,0 +1,23 @@
+apiVersion: triggers.tekton.dev/v1alpha1
+kind: TriggerBinding
+metadata:
+  creationTimestamp: null
+  name: app-globex-ui-binding
+spec:
+  params:
+  - name: imageRepo
+    value: "{{ $.Values.globex.registry.imageRepo }}"
+  - name: manifestRepo
+    value: "{{ $.Values.globex.gitea.manifestRepo }}"
+  - name: manifestFile
+    value: "{{ $.Values.globex.gitea.manifestFile }}"
+  - name: manifestFileProd
+    value: "{{ $.Values.globex.gitea.manifestFileProd }}"
+  - name: manifestRepoName
+    value: "{{ $.Values.globex.gitea.manifestRepoName }}"
+  - name: tlsVerify
+    value: "true"
+  - name: gitRepoHost
+    value: "{{ $.Values.globex.gitea.gitRepoHost }}"
+  - name: sonarqubeHostUrl
+    value: "{{ $.Values.globex.sonarqube.hostUrl }}"

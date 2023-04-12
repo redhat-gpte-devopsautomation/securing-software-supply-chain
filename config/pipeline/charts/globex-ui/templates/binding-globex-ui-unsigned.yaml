@@ -1,0 +1,15 @@
+apiVersion: triggers.tekton.dev/v1alpha1
+kind: TriggerBinding
+metadata:
+  creationTimestamp: null
+  name: app-globex-ui-unsigned-binding
+spec:
+  params:
+  - name: imageRepo
+    value: "{{ $.Values.globex.registry.imageRepo }}"
+  - name: manifestRepo
+    value: "{{ $.Values.globex.gitea.manifestRepo }}"
+  - name: manifestFile
+    value: "{{ $.Values.globex.gitea.manifestFileFail }}"
+  - name: tlsVerify
+    value: "true"

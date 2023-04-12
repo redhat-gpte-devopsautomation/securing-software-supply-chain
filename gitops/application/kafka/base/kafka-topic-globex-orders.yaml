@@ -1,0 +1,16 @@
+apiVersion: kafka.strimzi.io/v1beta2
+kind: KafkaTopic
+metadata:
+  labels:
+    strimzi.io/cluster: kafka-cluster
+  name: globex.orders
+  annotations:
+    argocd.argoproj.io/sync-wave: "2"
+    argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
+spec:
+  config:
+    retention.ms: 604800000
+    segment.bytes: 1073741824
+  partitions: 10
+  replicas: 1
+  topicName: globex.orders

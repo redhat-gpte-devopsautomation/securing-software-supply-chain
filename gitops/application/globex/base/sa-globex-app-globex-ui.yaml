@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  labels:
+    app.kubernetes.io/instance: globex-app
+    app.kubernetes.io/name: globex-ui
+    app.kubernetes.io/part-of: globex-app
+    app.kubernetes.io/version: 1.0.0
+  name: globex-app-globex-ui
+imagePullSecrets:
+  - name: image-registry-secret

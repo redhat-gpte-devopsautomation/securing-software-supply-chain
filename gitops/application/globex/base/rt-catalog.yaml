@@ -1,0 +1,21 @@
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  annotations:
+    openshift.io/host.generated: "true"
+  labels:
+    app.kubernetes.io/instance: globex-app
+    app.kubernetes.io/name: catalog
+    app.kubernetes.io/part-of: globex-app
+  name: catalog
+spec:
+  port:
+    targetPort: http
+  tls:
+    insecureEdgeTerminationPolicy: Redirect
+    termination: edge
+  to:
+    kind: Service
+    name: catalog
+    weight: 100
+  wildcardPolicy: None

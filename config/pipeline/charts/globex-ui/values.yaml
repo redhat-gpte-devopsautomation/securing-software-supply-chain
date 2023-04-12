@@ -1,0 +1,22 @@
+#ODF Chart Values
+
+globex:
+  registry:
+    imageRepo: ""
+    dockerConfigJson: ""
+  gitea:
+    manifestRepo: ""
+    manifestFile: ""
+    manifestFileProd: ""
+    manifestRepoName: ""
+    gitRepoHost: ""
+    manifestFileFail: ""
+    webhookSecretKey: ""
+    token: ""
+  sonarqube:
+    hostUrl: ""
+  cosign:
+    privateKey: ""
+    password: ""
+    publicKey: ""
+

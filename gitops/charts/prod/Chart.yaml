@@ -1,0 +1,7 @@
+apiVersion: v2
+name: devsecops-production-apps
+description: A Helm chart to deploy DevSecOps production applications
+type: application
+
+version: 0.1.0
+appVersion: 0.1.16

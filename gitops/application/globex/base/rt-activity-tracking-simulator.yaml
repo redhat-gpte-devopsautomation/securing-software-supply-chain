@@ -1,0 +1,22 @@
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  annotations:
+    openshift.io/host.generated: "true"
+  labels:
+    app.kubernetes.io/instance: globex-app
+    app.kubernetes.io/name: activity-tracking-simulator
+    app.kubernetes.io/part-of: globex-app
+    app.kubernetes.io/version: 1.0.0
+  name: activity-tracking-simulator
+spec:
+  port:
+    targetPort: http
+  tls:
+    insecureEdgeTerminationPolicy: Redirect
+    termination: edge
+  to:
+    kind: Service
+    name: activity-tracking-simulator
+    weight: 100
+  wildcardPolicy: None

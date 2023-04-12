@@ -1,0 +1,11 @@
+resources:
+- dep-globex-ui-unsigned.yaml
+
+patches:
+- target:
+    kind: Deployment
+    name: globex-ui-unsigned
+  patch: |-
+    - op: replace
+      path: /spec/template/spec/containers/0/image
+      value: "quay-l8xcj.apps.cluster-l8xcj.l8xcj.sandbox298.opentlc.com/quayadmin/inventory-unsigned:main-151e26f284cf3e017b210f2caea28f8a2c90f86e"

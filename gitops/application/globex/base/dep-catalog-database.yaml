@@ -1,0 +1,61 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app.kubernetes.io/instance: globex-app
+    app.kubernetes.io/name: catalog-database
+    app.kubernetes.io/part-of: globex-app
+    app.kubernetes.io/version: 1.0.0
+    app.openshift.io/runtime: postgresql
+  name: catalog-database
+spec:
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: catalog-database
+      app.kubernetes.io/part-of: globex-app
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: catalog-database
+        app.kubernetes.io/part-of: globex-app
+        name: catalog-database
+    spec:
+      containers:
+      - env:
+        - name: POSTGRESQL_USER
+          valueFrom:
+            secretKeyRef:
+              key: database-user
+              name: catalog-database
+        - name: POSTGRESQL_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              key: database-password
+              name: catalog-database
+        - name: POSTGRESQL_DATABASE
+          valueFrom:
+            secretKeyRef:
+              key: database-name
+              name: catalog-database
+        image: quay.io/redhat-gpte/globex-catalog-database:app-mod-workshop
+        imagePullPolicy: IfNotPresent
+        name: catalog-database
+        ports:
+        - containerPort: 5432
+          name: postgresql
+          protocol: TCP
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      serviceAccount: catalog-app
+      serviceAccountName: catalog-app
+      terminationGracePeriodSeconds: 30

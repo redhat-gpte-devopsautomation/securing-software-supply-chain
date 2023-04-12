@@ -1,0 +1,18 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: kafka
+  namespace: openshift-gitops
+spec:
+  destination:
+    namespace: "{{ $.Values.production.kafka.namespace }}"
+    server: 'https://kubernetes.default.svc'
+  project: default
+  source:
+    path: "{{ $.Values.production.kafka.contextDir }}"
+    repoURL: "{{ $.Values.production.repoUrl }}"
+    targetRevision: HEAD
+  syncPolicy:
+    automated: {}
+    syncOptions:
+    - CreateNamespace=true

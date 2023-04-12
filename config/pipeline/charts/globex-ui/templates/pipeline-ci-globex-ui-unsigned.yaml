@@ -1,0 +1,100 @@
+apiVersion: tekton.dev/v1beta1
+kind: Pipeline
+metadata:
+  name: app-globex-ui-unsigned-pipeline
+spec:
+  params:
+    - name: COMMIT_SHA
+      type: string
+    - name: TLSVERIFY
+      type: string
+    - name: BUILD_EXTRA_ARGS
+      type: string
+    - name: IMAGE_REPO
+      type: string
+    - name: IMAGE_TAG
+      type: string
+    - name: MANIFEST_FILE
+      type: string
+    - name: MANIFEST_REPO
+      type: string
+    - name: GIT_REF
+      type: string
+    - name: COMMIT_DATE
+      type: string
+    - name: COMMIT_AUTHOR
+      type: string
+    - name: COMMIT_MESSAGE
+      type: string
+    - name: GIT_REPO
+      type: string
+  tasks:
+    - name: fetch-source
+      params:
+        - name: url
+          value: $(params.GIT_REPO)
+        - name: revision
+          value: $(params.GIT_REF)
+        - name: deleteExisting
+          value: 'true'
+      taskRef:
+        kind: ClusterTask
+        name: git-clone
+      workspaces:
+        - name: output
+          workspace: shared-data
+    - name: build-image
+      retries: 1
+      params:
+        - name: TLSVERIFY
+          value: $(params.TLSVERIFY)
+        - name: BUILD_EXTRA_ARGS
+          value: >-
+            --label=io.openshift.build.commit.author='$(params.COMMIT_AUTHOR)'
+            --label=io.openshift.build.commit.date='$(params.COMMIT_DATE)'
+            --label=io.openshift.build.commit.id='$(params.COMMIT_SHA)'
+            --label=io.openshift.build.commit.message='$(params.COMMIT_MESSAGE)'
+            --label=io.openshift.build.commit.ref='$(params.GIT_REF)'
+            --ulimit=nofile=4096:4096
+        - name: IMAGE
+          value: '$(params.IMAGE_REPO)-unsigned:$(params.IMAGE_TAG)'
+      runAfter:
+        - fetch-source
+      taskRef:
+        kind: ClusterTask
+        name: buildah
+      workspaces:
+        - name: source
+          workspace: shared-data
+    - name: update-dev-manifest
+      params:
+        - name: image
+          value: '$(params.IMAGE_REPO)-unsigned:$(params.IMAGE_TAG)'
+        - name: configuration_file
+          value: $(params.MANIFEST_FILE)
+        - name: repository
+          value: $(params.MANIFEST_REPO)
+        - name: git_user_name
+          value: $(params.COMMIT_AUTHOR)
+      runAfter:
+        - build-image
+      taskRef:
+        kind: Task
+        name: update-manifest
+    - name: acs-image-check
+      params:
+        - name: rox_central_endpoint
+          value: stackrox-endpoint
+        - name: rox_api_token
+          value: stackrox-secret
+        - name: image
+          value: '$(params.IMAGE_REPO)-unsigned:$(params.IMAGE_TAG)'
+        - name: insecure-skip-tls-verify
+          value: 'true'
+      runAfter:
+        - update-dev-manifest
+      taskRef:
+        kind: Task
+        name: acs-image-check
+  workspaces:
+    - name: shared-data
