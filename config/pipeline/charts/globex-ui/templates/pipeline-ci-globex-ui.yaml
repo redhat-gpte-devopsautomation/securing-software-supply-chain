@@ -116,7 +116,7 @@ spec:
     - name: insecure-skip-tls-verify
       value: "true"
     runAfter:
-    - sign-image
+    - build-sign-image
     taskRef:
       kind: Task
       name: acs-image-scan
