@@ -61,8 +61,8 @@ spec:
       runAfter:
         - fetch-source
       taskRef:
-        kind: ClusterTask
-        name: buildah
+        kind: Task
+        name: buildah-no-sign
       workspaces:
         - name: source
           workspace: shared-data
