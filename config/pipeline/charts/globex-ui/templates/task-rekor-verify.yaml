@@ -34,7 +34,7 @@ spec:
 
         echo "${COSIGN_PUBLIC_KEY}" > /workspace/cosign.pub
 
-        cosign verify /workspace/cosign.pub $(params.image) --output-file
+        cosign verify --key /workspace/cosign.pub $(params.image) --output-file
         /workspace/cosign.verify
     - image: quay.io/redhat-gpte/jq
       name: extract-signature-details
