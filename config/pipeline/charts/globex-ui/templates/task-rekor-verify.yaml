@@ -64,5 +64,4 @@ spec:
       name: verify-attestation
       resources: {}
       script: |
-        set -x
         cat /workspace/rekor.get | jq -r .Attestation
