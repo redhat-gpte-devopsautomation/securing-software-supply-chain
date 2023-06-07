@@ -10,6 +10,7 @@ spec:
     script: |
       set -x
       apk add gpg-agent
+      git config --global --add safe.directory /workspace/repository
       git cat-file commit HEAD | sed -ne'/^gpgsig/,/---END/s/^[a-z]* //p' > /tmp/sig
       git cat-file commit HEAD | sed -e'/^gpgsig/d; /^ /d' > /tmp/commit
       GPG_SIG=$(cat /tmp/sig)

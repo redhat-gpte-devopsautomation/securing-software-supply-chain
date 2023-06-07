@@ -80,6 +80,8 @@ spec:
     workspaces:
     - name: repository
       workspace: shared-data
+    - name: secrets
+      workspace: secrets
   - name: build-sign-image
     retries: 1
     params:
