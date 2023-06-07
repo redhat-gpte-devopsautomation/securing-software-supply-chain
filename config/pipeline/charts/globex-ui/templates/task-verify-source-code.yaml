@@ -1,0 +1,24 @@
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: verify-source-code
+spec:
+  description: This task verifies the latest commit and signature against the gpg public key
+  steps:
+  - image: alpine/git:latest
+    name: git-verify
+    script: |
+      set -x
+      apk add gpg-agent
+      git clone https://gitea.apps.cluster-47dmd.47dmd.sandbox1745.opentlc.com/dev-user/globex-ui
+      cd globex-ui
+      git cat-file commit HEAD | sed -ne'/^gpgsig/,/---END/s/^[a-z]* //p' > /tmp/sig
+      git cat-file commit HEAD | sed -e'/^gpgsig/d; /^ /d' > /tmp/commit
+      GPG_SIG=$(cat /tmp/sig)
+      if [ -z "$GPG_SIG" ]; then echo "Commit at HEAD is not verfied!" && exit 1; fi
+      gpg --import /workspace/secrets/public.key
+      gpg --verify /tmp/sig /tmp/commit
+    workingDir: /workspace/repository
+  workspaces:
+  - name: repository
+  - name: secrets

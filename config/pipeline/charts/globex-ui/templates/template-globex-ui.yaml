@@ -103,3 +103,6 @@ spec:
           name: maven-settings
         - emptyDir: {}
           name: signature
+        - name: secrets
+          secret:
+            secretName: gpg-public-key
