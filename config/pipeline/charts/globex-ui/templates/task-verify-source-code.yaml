@@ -10,13 +10,9 @@ spec:
     script: |
       set -x
       apk add gpg-agent
-      git config --global --add safe.directory /workspace/repository
-      git cat-file commit HEAD | sed -ne'/^gpgsig/,/---END/s/^[a-z]* //p' > /tmp/sig
-      git cat-file commit HEAD | sed -e'/^gpgsig/d; /^ /d' > /tmp/commit
-      GPG_SIG=$(cat /tmp/sig)
-      if [ -z "$GPG_SIG" ]; then echo "Commit at HEAD is not signed!" && exit 1; fi
       gpg --import /workspace/secrets/public.key
-      gpg --verify /tmp/sig /tmp/commit
+      git config --global --add safe.directory /workspace/repository
+      git verify-commit HEAD || (echo "Commit at HEAD is not signed!" && exit 1)
     workingDir: /workspace/repository
   workspaces:
   - name: repository
