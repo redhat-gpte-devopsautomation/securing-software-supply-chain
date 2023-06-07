@@ -74,7 +74,7 @@ spec:
     taskRef:
       kind: Task
       name: verify-source-code
-  - name: build-image
+  - name: build-sign-image
     retries: 1
     params:
     - name: TLSVERIFY
@@ -94,22 +94,6 @@ spec:
     workspaces:
     - name: source
       workspace: shared-data
-  - name: sign-image
-    params:
-    - name: image
-      value: $(params.IMAGE_REPO):$(params.IMAGE_TAG)
-    - name: vaultSecretPath
-      value: secret/data/cosign
-    - name: registrySecret
-      value: image-registry-secret
-    runAfter:
-    - build-image
-    taskRef:
-      kind: Task
-      name: cosign-sign
-    workspaces:
-    - name: signature
-      workspace: signature
   - name: acs-image-check
     params:
     - name: rox_central_endpoint
@@ -121,7 +105,7 @@ spec:
     - name: insecure-skip-tls-verify
       value: "true"
     runAfter:
-    - sign-image
+    - build-sign-image
     taskRef:
       kind: Task
       name: acs-image-check
@@ -136,7 +120,7 @@ spec:
     - name: insecure-skip-tls-verify
       value: "true"
     runAfter:
-    - sign-image
+    - build-sign-image
     taskRef:
       kind: Task
       name: acs-image-scan
