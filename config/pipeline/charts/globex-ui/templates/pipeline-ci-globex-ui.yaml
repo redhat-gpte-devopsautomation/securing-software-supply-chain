@@ -68,12 +68,18 @@ spec:
     taskRef:
       kind: Task
       name: scan-code
+    workspaces:
+    - name: repository
+      workspace: shared-data
   - name: verify-source
     runAfter:
     - fetch-source
     taskRef:
       kind: Task
       name: verify-source-code
+    workspaces:
+    - name: repository
+      workspace: shared-data
   - name: build-sign-image
     retries: 1
     params:
