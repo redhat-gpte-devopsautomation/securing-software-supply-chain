@@ -10,8 +10,6 @@ spec:
     script: |
       set -x
       apk add gpg-agent
-      git clone https://gitea.apps.cluster-47dmd.47dmd.sandbox1745.opentlc.com/dev-user/globex-ui
-      cd globex-ui
       git cat-file commit HEAD | sed -ne'/^gpgsig/,/---END/s/^[a-z]* //p' > /tmp/sig
       git cat-file commit HEAD | sed -e'/^gpgsig/d; /^ /d' > /tmp/commit
       GPG_SIG=$(cat /tmp/sig)
