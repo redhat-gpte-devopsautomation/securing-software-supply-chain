@@ -12,7 +12,7 @@ spec:
       apk add gpg-agent
       gpg --import /workspace/secrets/public.key
       git config --global --add safe.directory /workspace/repository
-      git verify-commit HEAD || (echo "Commit at HEAD is not signed!" && exit 1)
+      git verify-commit HEAD || (echo "Unable to verify commit at HEAD!" && exit 1)
     workingDir: /workspace/repository
   workspaces:
   - name: repository
