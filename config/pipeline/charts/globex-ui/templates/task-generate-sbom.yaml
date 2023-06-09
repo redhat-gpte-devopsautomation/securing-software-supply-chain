@@ -20,7 +20,7 @@ spec:
 
         /usr/src/cyclonedx-bom/bin/make-bom.js -o bom.xml
 
-        curl -X POST $(params.cyclonedxHostUrl)/v1/bom -H "Content-Type: application/vnd.cyclonedx+xml; version=1.4" -H "Accept: */*" --data-raw "$(cat bom.xml)" -D /tmp/header.txt
+        curl -X POST $(params.cyclonedxHostUrl)/v1/bom -H "Content-Type: application/vnd.cyclonedx+xml; version=1.4" -H "Accept: */*" -d @bom.xml -D /tmp/header.txt
 
         LOCATION=$(cat /tmp/header.txt | grep location: | awk '{print $2}' | sed 's|http:|https:|g')
 
