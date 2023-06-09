@@ -97,7 +97,7 @@ spec:
                 - ReadWriteOnce
               resources:
                 requests:
-                  storage: 1Gi
+                  storage: 3Gi
             status: {}
         - emptyDir: {}
           name: maven-settings
