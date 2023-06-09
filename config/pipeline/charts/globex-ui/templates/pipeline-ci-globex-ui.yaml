@@ -82,6 +82,15 @@ spec:
       workspace: shared-data
     - name: secrets
       workspace: secrets
+  - name: create-sbom
+    runAfter:
+    - fetch-source
+    taskRef:
+      kind: Task
+      name: create-sbom
+    workspaces:
+    - name: repository
+      workspace: shared-data
   - name: build-sign-image
     retries: 1
     params:
@@ -96,6 +105,7 @@ spec:
     runAfter:
     - scan-source
     - verify-source
+    - generate-sbom
     taskRef:
       kind: ClusterTask
       name: buildah
