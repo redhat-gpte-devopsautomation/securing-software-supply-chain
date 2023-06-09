@@ -13,7 +13,7 @@ spec:
       resources:
        requests:
          memory: 1Gi
-      script: >
+      script: |
         apk add git curl
 
         npm install .
