@@ -40,6 +40,8 @@ spec:
     type: string
   - name: SONARQUBE_PROJECT_SECRET
     type: string
+  - name: CYCLONEDX_HOST_URL
+    type: string
   tasks:
   - name: fetch-source
     params:
@@ -133,6 +135,9 @@ spec:
       kind: Task
       name: acs-image-scan
   - name: generate-sbom
+    params:
+    - name: cyclonedxHostUrl
+      value: $(params.CYCLONEDX_HOST_URL)
     runAfter:
     - build-sign-image
     taskRef:

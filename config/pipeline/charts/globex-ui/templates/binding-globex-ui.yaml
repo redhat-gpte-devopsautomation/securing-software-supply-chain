@@ -21,3 +21,5 @@ spec:
     value: "{{ $.Values.globex.gitea.gitRepoHost }}"
   - name: sonarqubeHostUrl
     value: "{{ $.Values.globex.sonarqube.hostUrl }}"
+  - name: cyclonedxHostUrl
+    value: "{{ $.Values.globex.cyclonedx.hostUrl }}"

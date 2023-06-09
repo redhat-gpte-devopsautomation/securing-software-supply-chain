@@ -3,6 +3,10 @@ kind: Task
 metadata:
   name: generate-sbom
 spec:
+  params:
+  - default: https://cyclonedx-bom-repo-server-cyclonedx.apps.cluster-tr47n.tr47n.sandbox987.opentlc.com/
+    name: cyclonedxHostUrl
+    type: string
   steps:
     - image: cyclonedx/cyclonedx-node
       name: test
@@ -10,13 +14,17 @@ spec:
        requests:
          memory: 1Gi
       script: >
-        apk add git jq
+        apk add git curl
 
         npm install .
 
-        /usr/src/cyclonedx-bom/bin/make-bom.js -o bom.json
+        /usr/src/cyclonedx-bom/bin/make-bom.js -o bom.xml
 
-        cat bom.json | jq
+        curl -X POST $(params.cyclonedxHostUrl)/v1/bom -H "Content-Type: application/vnd.cyclonedx+xml; version=1.4" -H "Accept: */*" --data-raw "$(cat bom.xml)" -D /tmp/header.txt
+
+        LOCATION=$(cat /tmp/header.txt | grep location: | awk '{print $2}' | sed 's|http:|https:|g')
+
+        echo "SBOM located at $LOCATION"
       workingDir: /workspace/repository
   workspaces:
   - name: repository
