@@ -9,7 +9,7 @@ spec:
     type: string
   steps:
     - image: cyclonedx/cyclonedx-node
-      name: test
+      name: generate-sbom
       resources:
        requests:
          memory: 1Gi
