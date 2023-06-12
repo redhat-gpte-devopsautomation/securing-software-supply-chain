@@ -7,6 +7,9 @@ spec:
   - default: https://cyclonedx-bom-repo-server-cyclonedx.apps.cluster-tr47n.tr47n.sandbox987.opentlc.com/
     name: cyclonedxHostUrl
     type: string
+  results:
+    - description: The url location of the generate SBOM
+      name: sbomUrl
   steps:
     - image: cyclonedx/cyclonedx-node
       name: generate-sbom
@@ -24,7 +27,9 @@ spec:
 
         LOCATION=$(cat /tmp/header.txt | grep location: | awk '{print $2}' | sed 's|http:|https:|g')
 
-        echo "SBOM located at $LOCATION"
+        printf "%s" "$LOCATION" > "$(results.sbomUrl.path)"
+
+        echo "SBOM URL accessible on Results of TaskRun $(context.taskRun.name)."
       workingDir: /workspace/repository
   workspaces:
   - name: repository
