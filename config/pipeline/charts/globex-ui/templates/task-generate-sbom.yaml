@@ -29,7 +29,7 @@ spec:
 
         printf "%s" "$LOCATION" > "$(results.sbomUrl.path)"
 
-        echo "SBOM URL accessible on Results of TaskRun $(context.taskRun.name)."
+        echo "SBOM URL accessible on Results of TaskRun $(context.taskRun.name)"
       workingDir: /workspace/repository
   workspaces:
   - name: repository
