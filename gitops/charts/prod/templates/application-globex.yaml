@@ -18,7 +18,8 @@ spec:
     repoURL: "{{ $.Values.production.repoUrl }}"
     targetRevision: HEAD
   syncPolicy:
-    automated: {}
+    automated:
+      selfHeal: true
     syncOptions:
     - RespectIgnoreDifferences=true
     - CreateNamespace=true
