@@ -1,0 +1,35 @@
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: generate-sbom
+spec:
+  params:
+  - default: https://cyclonedx-bom-repo-server-cyclonedx.apps.cluster-tr47n.tr47n.sandbox987.opentlc.com/
+    name: cyclonedxHostUrl
+    type: string
+  results:
+    - description: The url location of the generate SBOM
+      name: sbomUrl
+  steps:
+    - image: cyclonedx/cyclonedx-node
+      name: generate-sbom
+      resources:
+       requests:
+         memory: 1Gi
+      script: |
+        apk add git curl
+
+        npm install .
+
+        /usr/src/cyclonedx-bom/bin/make-bom.js -o bom.xml
+
+        curl -X POST $(params.cyclonedxHostUrl)/v1/bom -H "Content-Type: application/vnd.cyclonedx+xml; version=1.4" -H "Accept: */*" -d @bom.xml -D /tmp/header.txt
+
+        LOCATION=$(cat /tmp/header.txt | grep location: | awk '{print $2}' | sed 's|http:|https:|g')
+
+        printf "%s" "$LOCATION" > "$(results.sbomUrl.path)"
+
+        echo "SBOM URL accessible on Results of TaskRun $(context.taskRun.name)"
+      workingDir: /workspace/repository
+  workspaces:
+  - name: repository

@@ -40,14 +40,8 @@ spec:
       name: extract-signature-details
       resources: {}
       script: >
-        COSIGN_JWT=$(cat /workspace/cosign.verify | jq
-        '.[0].optional.Bundle.Payload.body' | sed 's/\"//g' | base64 --decode)
-
-        echo $COSIGN_JWT | jq '.spec.data.hash.value' | sed 's/\"//g' >
+        cat /workspace/cosign.verify | jq --raw-output '.[0] | .critical | .image | .["docker-manifest-digest"]' >
         /workspace/cosign.sha
-
-        echo $COSIGN_JWT | jq '.spec.signature.content' | sed 's/\"//g' >
-        /workspace/cosign.content
     - image: quay.io/redhat-gpte/rekor-cli
       name: rekor-search-sha
       resources: {}
@@ -67,19 +61,7 @@ spec:
         rekor-cli get --uuid $(cat /workspace/rekor.uuid) --format json >
         /workspace/rekor.get
     - image: quay.io/redhat-gpte/jq
-      name: compare-signature-content
+      name: verify-attestation
       resources: {}
-      script: >
-        cat /workspace/rekor.get | jq '.Body.HashedRekordObj.signature.content'|
-        sed 's/\"//g' > /workspace/rekor.content
-
-        COSIGN_CONTENT=$(cat /workspace/cosign.content) REKOR_CONTENT=$(cat
-        /workspace/rekor.content)
-
-        echo "Cosign signature content: $COSIGN_CONTENT"
-
-        echo "Rekor signature content: $REKOR_CONTENT"
-
-        sh -c 'if ["$COSIGN_CONTENT" = "$REKOR_CONTENT"]; then echo "Signature
-        verified on Rekor Transparency Log"; else echo "Signature not verified
-        on Rekor Transparency Log"; exit 1; fi'
+      script: |
+        cat /workspace/rekor.get | jq -r .Attestation

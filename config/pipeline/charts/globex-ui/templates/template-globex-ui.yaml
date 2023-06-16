@@ -41,6 +41,8 @@ spec:
     name: imageRepo
   - description: Sonarqube host url
     name: sonarqubeHostUrl
+  - description: Cyclonedx host url
+    name: cyclonedxHostUrl
   resourcetemplates:
   - apiVersion: tekton.dev/v1beta1
     kind: PipelineRun
@@ -84,6 +86,8 @@ spec:
         value: globex-ui
       - name: SONARQUBE_PROJECT_SECRET
         value: globex-ui-sonarqube-secret
+      - name: CYCLONEDX_HOST_URL
+        value: $(tt.params.cyclonedxHostUrl)
       pipelineRef:
         name: app-globex-ui-pipeline
       serviceAccountName: pipeline
@@ -97,9 +101,12 @@ spec:
                 - ReadWriteOnce
               resources:
                 requests:
-                  storage: 1Gi
+                  storage: 3Gi
             status: {}
         - emptyDir: {}
           name: maven-settings
         - emptyDir: {}
           name: signature
+        - name: secrets
+          secret:
+            secretName: gpg-public-key

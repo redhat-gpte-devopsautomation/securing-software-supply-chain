@@ -40,6 +40,8 @@ spec:
     type: string
   - name: SONARQUBE_PROJECT_SECRET
     type: string
+  - name: CYCLONEDX_HOST_URL
+    type: string
   tasks:
   - name: fetch-source
     params:
@@ -71,7 +73,18 @@ spec:
     workspaces:
     - name: repository
       workspace: shared-data
-  - name: build-image
+  - name: verify-source
+    runAfter:
+    - fetch-source
+    taskRef:
+      kind: Task
+      name: verify-source-code
+    workspaces:
+    - name: repository
+      workspace: shared-data
+    - name: secrets
+      workspace: secrets
+  - name: build-sign-image
     retries: 1
     params:
     - name: TLSVERIFY
@@ -84,28 +97,13 @@ spec:
       value: $(params.IMAGE_REPO):$(params.IMAGE_TAG)
     runAfter:
     - scan-source
+    - verify-source
     taskRef:
       kind: ClusterTask
       name: buildah
     workspaces:
     - name: source
       workspace: shared-data
-  - name: sign-image
-    params:
-    - name: image
-      value: $(params.IMAGE_REPO):$(params.IMAGE_TAG)
-    - name: vaultSecretPath
-      value: secret/data/cosign
-    - name: registrySecret
-      value: image-registry-secret
-    runAfter:
-    - build-image
-    taskRef:
-      kind: Task
-      name: cosign-sign
-    workspaces:
-    - name: signature
-      workspace: signature
   - name: acs-image-check
     params:
     - name: rox_central_endpoint
@@ -117,7 +115,7 @@ spec:
     - name: insecure-skip-tls-verify
       value: "true"
     runAfter:
-    - sign-image
+    - build-sign-image
     taskRef:
       kind: Task
       name: acs-image-check
@@ -132,10 +130,22 @@ spec:
     - name: insecure-skip-tls-verify
       value: "true"
     runAfter:
-    - sign-image
+    - build-sign-image
     taskRef:
       kind: Task
       name: acs-image-scan
+  - name: generate-sbom
+    params:
+    - name: cyclonedxHostUrl
+      value: $(params.CYCLONEDX_HOST_URL)
+    runAfter:
+    - build-sign-image
+    taskRef:
+      kind: Task
+      name: generate-sbom
+    workspaces:
+    - name: repository
+      workspace: shared-data
   - name: update-dev-manifest
     params:
     - name: image
@@ -149,6 +159,7 @@ spec:
     runAfter:
     - acs-image-check
     - acs-image-scan
+    - generate-sbom
     taskRef:
       kind: Task
       name: update-manifest
@@ -227,3 +238,4 @@ spec:
   - name: shared-data
   - name: maven-settings
   - name: signature
+  - name: secrets

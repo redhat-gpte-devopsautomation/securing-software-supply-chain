@@ -7,4 +7,4 @@ patches:
   patch: |-
     - op: replace
       path: /spec/template/spec/containers/0/image
-      value: quay.io/redhat-gpte/globex-recommendation-ui:app-mod-workshop
+      value: "{{ _internal_globex_ui_prod_image }}"
