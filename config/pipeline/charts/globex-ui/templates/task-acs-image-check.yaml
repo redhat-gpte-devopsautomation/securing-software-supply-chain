@@ -41,7 +41,7 @@ spec:
         secretKeyRef:
           key: rox_central_endpoint
           name: $(params.rox_central_endpoint)
-    image: docker.io/centos@sha256:a1801b843b1bfaf77c501e7a6d3f709401a1e0c83863037fa3aab063a7fdb9dc
+    image: registry.access.redhat.com/ubi8/ubi-minimal
     name: rox-image-check
     script: |
       #!/usr/bin/env bash
