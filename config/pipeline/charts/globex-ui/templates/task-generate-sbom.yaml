@@ -11,17 +11,13 @@ spec:
     - description: The url location of the generate SBOM
       name: sbomUrl
   steps:
-    - image: cyclonedx/cyclonedx-node
-      name: generate-sbom
+    - image: 'quay.io/redhat-gpte/syft:0.88.0'
+      name: create-sbom
       resources:
-       requests:
-         memory: 1Gi
-      script: |
-        apk add git curl
-
-        npm install .
-
-        /usr/src/cyclonedx-bom/bin/make-bom.js -o bom.xml
+        requests:
+          memory: 1Gi
+      script: >
+        syft . --output cyclonedx-xml --source-name globex-ui > ./bom.xml
 
         curl -X POST $(params.cyclonedxHostUrl)/v1/bom -H "Content-Type: application/vnd.cyclonedx+xml; version=1.4" -H "Accept: */*" -d @bom.xml -D /tmp/header.txt
 
@@ -30,6 +26,16 @@ spec:
         printf "%s" "$LOCATION" > "$(results.sbomUrl.path)"
 
         echo "SBOM URL accessible on Results of TaskRun $(context.taskRun.name)"
+      workingDir: /workspace/repository
+    - image: 'quay.io/redhat-gpte/grype:0.65.2'
+      name: scan-sbom
+      resources:
+        requests:
+          memory: 1Gi
+      script: >
+        set -x
+
+        grype sbom:./bom.xml -o table
       workingDir: /workspace/repository
   workspaces:
   - name: repository
