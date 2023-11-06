@@ -100,9 +100,6 @@ spec:
     workspaces:
     - name: source
       workspace: shared-data
-    workspaces:
-    - name: source
-      workspace: shared-data
   - name: acs-image-check
     params:
     - name: rox_central_endpoint
