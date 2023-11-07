@@ -87,19 +87,15 @@ spec:
   - name: build-sign-image
     retries: 1
     params:
-    - name: TLSVERIFY
-      value: $(params.TLSVERIFY)
-    - name: BUILD_EXTRA_ARGS
-      value: --label=io.openshift.build.commit.author='$(params.COMMIT_AUTHOR)' --label=io.openshift.build.commit.date='$(params.COMMIT_DATE)'
-        --label=io.openshift.build.commit.id='$(params.COMMIT_SHA)' --label=io.openshift.build.commit.message='$(params.COMMIT_MESSAGE)'
-        --label=io.openshift.build.commit.ref='$(params.GIT_REF)' --ulimit=nofile=4096:4096
     - name: IMAGE
       value: $(params.IMAGE_REPO):$(params.IMAGE_TAG)
+    - name: COMMIT_SHA
+      value: $(params.COMMIT_SHA)
     runAfter:
     - scan-source
     - verify-source
     taskRef:
-      kind: ClusterTask
+      kind: Task
       name: buildah
     workspaces:
     - name: source
@@ -134,15 +130,17 @@ spec:
     taskRef:
       kind: Task
       name: acs-image-scan
-  - name: generate-sbom
+  - name: scan-export-sbom
     params:
     - name: cyclonedxHostUrl
       value: $(params.CYCLONEDX_HOST_URL)
+    - name: image
+      value: $(params.IMAGE_REPO):$(params.IMAGE_TAG)
     runAfter:
     - build-sign-image
     taskRef:
       kind: Task
-      name: generate-sbom
+      name: scan-export-sbom
     workspaces:
     - name: repository
       workspace: shared-data
@@ -159,7 +157,7 @@ spec:
     runAfter:
     - acs-image-check
     - acs-image-scan
-    - generate-sbom
+    - scan-export-sbom
     taskRef:
       kind: Task
       name: update-manifest
