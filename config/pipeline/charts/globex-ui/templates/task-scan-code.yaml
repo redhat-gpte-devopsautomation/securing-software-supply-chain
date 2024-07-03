@@ -4,7 +4,7 @@ metadata:
   name: scan-code
 spec:
   params:
-  - default: docker.io/sonarsource/sonar-scanner-cli:4.7
+  - default: docker.io/sonarsource/sonar-scanner-cli:10.0
     name: scanImage
     type: string
   - default: https://sonarqube-sonarqube.apps.cluster-tpn6s.sandbox2653.opentlc.com/
