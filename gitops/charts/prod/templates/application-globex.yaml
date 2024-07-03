@@ -9,10 +9,9 @@ spec:
     server: 'https://kubernetes.default.svc'
   project: default
   ignoreDifferences:
-    - group: '*'
-      jqPathExpressions:
-        - '.imagePullSecrets[] | select(.name|test(".-dockercfg-."))'
-      kind: ServiceAccount
+    - kind: ServiceAccount
+      jsonPointers:
+      - /imagePullSecrets
   source:
     path: "{{ $.Values.production.globex.contextDir }}"
     repoURL: "{{ $.Values.production.repoUrl }}"
