@@ -7,3 +7,4 @@ metadata:
     app.kubernetes.io/part-of: globex-app
     app.kubernetes.io/version: 1.0.0
   name: activity-tracking
+imagePullSecrets: []
