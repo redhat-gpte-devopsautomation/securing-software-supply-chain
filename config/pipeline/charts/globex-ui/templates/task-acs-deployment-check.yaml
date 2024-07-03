@@ -18,7 +18,7 @@ spec:
       name: rox_api_token
       type: string
     - default: >-
-        https://dev-user:openshift@gitea.apps.cluster-5khxf.5khxf.sandbox2563.opentlc.com/dev-user/securing-software-supply-chain.git
+        https://dev-user:xxxx@gitea.apps.cluster-5khxf.5khxf.sandbox2563.opentlc.com/dev-user/securing-software-supply-chain.git
       name: gitRepositoryUrl
       type: string
     - default: main
