@@ -9,9 +9,9 @@ spec:
     server: 'https://kubernetes.default.svc'
   project: default
   ignoreDifferences:
-    - kind: ServiceAccount
-      jsonPointers:
-      - /imagePullSecrets
+    - jsonPointers:
+        - /imagePullSecrets
+      kind: ServiceAccount
   source:
     path: "{{ $.Values.production.globex.contextDir }}"
     repoURL: "{{ $.Values.production.repoUrl }}"
